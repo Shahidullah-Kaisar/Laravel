@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -12,7 +13,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::with('category')->latest()->get();
+        return view('index', compact('posts'));
     }
 
     /**
@@ -34,9 +36,15 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $user = User::findOrFail($post->user_id);
+        $post->user = $user;
+
+        $post->load('comments', 'category');
+
+        return view('postDetails', compact('post'));
     }
 
     /**
